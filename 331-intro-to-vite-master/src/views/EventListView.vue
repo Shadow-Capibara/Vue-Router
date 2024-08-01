@@ -2,13 +2,21 @@
   import EventCard from '@/components/EventCard.vue'
   import EventDetails from '@/components/EventDetails.vue'
   import { Event } from '@/type/Event'
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, computed } from 'vue'
   import EventService from '@/services/EventService'
 
   const events = ref<Event[]>(null)
 
+  const props = defineProps({
+    page: {
+      type: Number,
+      required: true
+    }
+  })
+  const page = computed(() => props.page)
+
   onMounted(() => {
-    EventService.getEvents()
+    EventService.getEvents(2,page.value)
     .then((response) => {
       events.value = response.data
     })
