@@ -33,6 +33,7 @@
     <EventCard v-for="event in events" :key="event.id" :event="event"/>
     <EventDetails v-for="event in events" :key="event.id" :event="event"/>
   </div>
+  <RouterLink :to="{name: 'event-list-view', query:{ page: page + 1}}" rel="next" >Next page</RouterLink>
 </template>
 
 <style scoped>
