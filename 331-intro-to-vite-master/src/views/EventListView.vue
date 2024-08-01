@@ -7,7 +7,11 @@
 import { error } from 'console'
 
   const events = ref<Event[] | null>(null)
-
+  const totalEvents = ref(0)
+  const hasNextPage = computed(() =>{
+    const totalPages = Math.ceil(totalEvents.value/2)
+    return page.value < totalPages
+  })
   const props = defineProps({
     page: {
       type: Number,
@@ -22,6 +26,7 @@ import { error } from 'console'
       EventService.getEvents(2,page.value)
         .then((response) =>{
           events.value = response.data
+          totalEvents.value = response.headers['x-total-count']
         })
         .catch((error) =>{
           console.error('There was an error!' , error)
@@ -37,7 +42,11 @@ import { error } from 'console'
     <EventCard v-for="event in events" :key="event.id" :event="event"/>
     <EventDetails v-for="event in events" :key="event.id" :event="event"/>
   </div>
-  <RouterLink :to="{name: 'event-list-view', query:{ page: page + 1}}" rel="next" >Next page</RouterLink>
+  <RouterLink 
+  :to="{name: 'event-list-view', query:{ page: page + 1}}" 
+  rel="next" 
+  v-if="hasNextPage"
+  >Next page</RouterLink>
 </template>
 
 <style scoped>
