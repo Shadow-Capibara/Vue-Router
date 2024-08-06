@@ -8,22 +8,30 @@ import { error } from 'console'
 
   const events = ref<Event[] | null>(null)
   const totalEvents = ref(0)
-  const hasNextPage = computed(() =>{
-    const totalPages = Math.ceil(totalEvents.value/2)
-    return page.value < totalPages
-  })
+
   const props = defineProps({
     page: {
       type: Number,
       required: true
+    },
+    pageSize:{
+      type: Number,
+      required: true
     }
   })
+
   const page = computed(() => props.page)
+  const pageSize = computed(() => props.pageSize)
+
+  const hasNextPage = computed(() =>{
+    const totalPages = Math.ceil(totalEvents.value/2)
+    return page.value < totalPages
+  })
 
   onMounted(() => {
     watchEffect(() =>{
       events.value = null
-      EventService.getEvents(2,page.value)
+      EventService.getEvents(pageSize.value,page.value)
         .then((response) =>{
           events.value = response.data
           totalEvents.value = response.headers['x-total-count']
@@ -44,14 +52,15 @@ import { error } from 'console'
     <div class="pagination">
     <RouterLink 
     id="page-prev"
-    :to="{name: 'event-list-view', query: { page:page-1}}"
+    :to="{name: 'event-list-view', query: { page:page-1, pageSize: pageSize}}"
     rel="prev"
     v-if="page != 1"
-    >&%60; Prev Page
+    >&#60; Prev Page
     </RouterLink>
+
     <RouterLink
     id="page-next"
-    :to="{name: 'event-list-view', query:{page: page + 1}}"
+    :to="{name: 'event-list-view', query:{page: page + 1,pageSize: pageSize}}"
     rel="next"
     v-if="hasNextPage"
     >Next Page &#62;
