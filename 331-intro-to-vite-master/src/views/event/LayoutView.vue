@@ -1,36 +1,40 @@
 <script setup lang="ts">
-import { ref, onMounted, defineProps } from 'vue';
+import { ref, onMounted } from 'vue'
 import { type Event } from '@/types'
-import EventService from '@/services/EventService';
+import EventService from '@/services/EventService'
+import { useRouter } from 'vue-router';
 
-const event = ref<Event | null>(null);
+const event = ref<Event | null>(null)
 const props = defineProps({
-    id: {
-        type: String,
-        required: true
-    }
+  id: {
+    type: String,
+    required: true
+  }
 })
+
+const router = useRouter()
 
 onMounted(() => {
   EventService.getEvent(parseInt(props.id))
-    .then((response) => {
-      event.value = response.data;
+    .then(response => {
+      event.value = response.data
     })
-    .catch((error) => {
-      console.error('There was an error!', error);
-    });
-});
+    .catch(() => {
+      router.push({
+        name: '404-resource-view',
+        params: { resource: 'event' }
+      })
+    })
+})
 </script>
-
 <template>
   <div v-if="event">
     <h1>{{ event.title }}</h1>
     <nav>
-        <router-link :to="{ name: 'event-detail-view'}">Details</router-link>
-        <router-link :to="{ name: 'event-register-view'}">Register</router-link>
-        <router-link :to="{ name: 'event-edit-view'}">Edit</router-link>
+        <RouterLink :to="{ name: 'event-detail-view' }">Details</RouterLink>
+        <RouterLink :to="{ name: 'event-register-view' }">Register</RouterLink>
+        <RouterLink :to="{ name: 'event-edit-view' }">Edit</RouterLink>
     </nav>
-    <p>{{ event.time }} on {{ event.date }} @ {{ event.location }}</p>
-    <p>{{ event.description }}</p>
+      <RouterView :event="event" />
   </div>
 </template>
